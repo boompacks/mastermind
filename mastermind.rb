@@ -1,6 +1,6 @@
 class Mastermind
   def initialize()
-    @numbers = Array((0..9)) 
+    @numbers = Array((1..6)) 
     @computer_code = []
     @user_code = []
     @turn = 0
@@ -13,7 +13,7 @@ class Mastermind
   end
 
 
-  def input_code()
+  def get_user_code()
     puts "Input the code"
     4.times do   
       loop do
@@ -25,30 +25,53 @@ class Mastermind
   end
 
 
-  def get_user_code(codebreaker)
-    codebreaker == "player" ? input_code() : random_code()
+  def win?()
+    @user_code == @computer_code
   end
 
 
-  def win?()
-    @user_code == @computer_code
+  def give_feedback()
+    @correct_positions = 0
+    @current_matches = 0
+    @temporary_computer_code = @computer_code.dup
+    @temporary_user_code = @user_code.dup
+    
+    # check for correct positions
+    4.times {|i| @correct_positions += 1 if @user_code[i] == @computer_code[i] }
+
+    # check for matches
+    @temporary_user_code.length.times do |i|
+      @temporary_computer_code.length.times do |j| 
+        if @temporary_computer_code[j] == @temporary_user_code[i] && @temporary_computer_code[i] != @temporary_user_code[i]
+          @current_matches += 1 
+          @temporary_computer_code[j] = nil
+          @temporary_user_code[i] = -1
+          break
+        end
+      end
+    end
+    puts "Correct positions: #{@correct_positions} \nMatches: #{@current_matches} "
   end
  
   public
   def guess()
     random_code()
-    p @computer_code
-    while @turn < 10 && @match == false
+    while @turn < 12 && @match == false
       @user_code = []
-      get_user_code("player")
+      get_user_code()
       @match = win?()
+      give_feedback()
       @turn += 1
     end
     @match == true ? @message = "Congratulations, you broke the code" : @message = "The codemaster wins"
     p @message
   end
 
+
   def create()
+    p "Input the code to break"
+    @user_code = get_user_code()
+    p @user_code
   end
 end
 
